@@ -1,0 +1,77 @@
+from telegram import Update, KeyboardButton, ReplyKeyboardMarkup
+from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, filters, ContextTypes
+
+# Avtobus ma'lumotlari
+bus_data = {
+    "1-AVTOBUS": {
+        "image": "1-avtobus.jpg",
+        "info": (
+            "🚌 1-AVTOBUS 🚌\n\n"
+            "💰 Narxi: 2000 so'm\n"
+            "💳 Plastik bilan to'lash: 1600 so'm (ayrim hollarda 600 so'm)\n"
+            "🧒 Bolalar: 7 yoshgacha bepul\n"
+            "📦 Ortiqcha yuk: 10 kg dan oshsa – 5000 so'm\n\n"
+            "🗺 Yo'nalish xaritada ko'rsatilgan!"
+        )
+    },
+    "2-Avtobus": {
+        "image": "2-avtobus.jpg",
+        "info": (
+            "🚌 2-AVTOBUS 🚌\n\n"
+            "💰 Narxi: 2000 so'm\n"
+            "💳 Plastik bilan to'lash: 1600 so'm (ayrim hollarda 600 so'm)\n"
+            "🧒 Bolalar: 7 yoshgacha bepul\n"
+            "📦 Ortiqcha yuk: 10 kg dan oshsa – 5000 so'm\n\n"
+            "🗺 Yo'nalish xaritada ko'rsatilgan!"
+        )
+    },
+    "4-Avtobus": {
+        "image": "4-avtobus.jpg",
+        "info": (
+            "🚌 4-AVTOBUS 🚌\n\n"
+            "💰 Narxi: 2000 so'm\n"
+            "💳 Plastik bilan to'lash: 1600 so'm (ayrim hollarda 600 so'm)\n"
+            "🧒 Bolalar: 7 yoshgacha bepul\n"
+            "📦 Ortiqcha yuk: 10 kg dan oshsa – 5000 so'm\n\n"
+            "🗺 Yo'nalish xaritada ko'rsatilgan!"
+        )
+    }
+}
+
+# /start komandasi
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    buttons = [
+        [KeyboardButton("1-AVTOBUS")],
+        [KeyboardButton("2-Avtobus")],
+        [KeyboardButton("4-Avtobus")]
+    ]
+    markup = ReplyKeyboardMarkup(buttons, resize_keyboard=True)
+    await update.message.reply_text("Qaysi avtobus yo'nalishini bilmoqchisiz?", reply_markup=markup)
+
+# Foydalanuvchi xabarlari
+async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    text = update.message.text
+
+    if text in bus_data:
+        with open(bus_data[text]["image"], 'rb') as img:
+            await update.message.reply_photo(
+                photo=img,
+                caption=bus_data[text]["info"]
+            )
+    else:
+        await update.message.reply_text("Bu yo'nalish haqida ma'lumot topilmadi.")
+
+# Botni ishga tushirish
+if name == 'main':
+    import os
+    from dotenv import load_dotenv
+    load_dotenv()
+
+    token = os.getenv("BOT_TOKEN")
+
+    app = ApplicationBuilder().token(token).build()
+    app.add_handler(CommandHandler("start", start))
+    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
+
+    print("Bot ishga tushdi...")
+    app.run_polling()
